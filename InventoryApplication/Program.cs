@@ -8,21 +8,29 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Get Connection String from the connected database
-        // If getting "keyword not supported" error, remove 'Trust Server Certificate=True' from connection string
-        string connectionString = "Data Source=Adrian\\MSSQLSERVER01;Initial Catalog=InventoryCRUD;Integrated Security=True;Trust Server Certificate=True";
-        ProductManager productManager = new ProductManager(connectionString);
+        // Placed inside try catch in case error occurs
+        try
+        {
+            // Get Connection String from the connected database
+            // If getting "keyword not supported" error, remove 'Trust Server Certificate=True' from connection string
+            string connectionString = "Data Source=Adrian\\MSSQLSERVER01;Initial Catalog=InventoryCRUD;Integrated Security=True;Trust Server Certificate=True";
+            ProductManager productManager = new ProductManager(connectionString);
 
-        Choices(productManager);
+            // Call choices UI
+            Choices(productManager);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 
     private static void Choices(ProductManager productManager)
     {
-
-        // UI Start
         Console.WriteLine("\nWelcome to Inventory Management App");
         Console.WriteLine("\nUse the Up and Down key to navigate and press the Enter key to select an option:");
 
+        // Declare needed variables
         ConsoleKeyInfo key;
         (int left, int top) = Console.GetCursorPosition();
         bool isSelected = false;
@@ -32,17 +40,23 @@ class Program
         // Options UI
         while (!isSelected)
         {
-            // Prevent choices from being displayed again
+            // Gets console cursor position to render UI in the same spot
             Console.SetCursorPosition(left, top);
 
+            // Checks if selector is equal to the number of the option.
+            // If yes, it will display the arrow next to the option in the console
             Console.WriteLine($" {(selector == 1 ? arrow : "  ")} View all products");
             Console.WriteLine($" {(selector == 2 ? arrow : "  ")} Get inventory price");
             Console.WriteLine($" {(selector == 3 ? arrow : "  ")} Add a product");
             Console.WriteLine($" {(selector == 4 ? arrow : "  ")} Update a product");
             Console.WriteLine($" {(selector == 5 ? arrow : "  ")} Remove a product");
 
+            // Checks if user pressed a key
             key = Console.ReadKey(true);
 
+            // Navigate options with selector
+            // If user presses Up, reduce selector value and increase if user presses Down
+            // If user presses Enter, break the loop and proceed to class selection
             switch (key.Key)
             {
                 case ConsoleKey.UpArrow:
@@ -57,7 +71,8 @@ class Program
 
             }
 
-            // Make the selector loop through the options
+            // Make the selector loop through the options by settting it to the minimum
+            // or maximum value if its value goes under the minimum or over the maximum
             if (selector > 5)
             {
                 selector = 1;
@@ -68,7 +83,7 @@ class Program
             }
         }
 
-        // Use class
+        // Use the class methods depending on selector value
         switch (selector)
         {
             case 1:
@@ -76,7 +91,7 @@ class Program
                 productManager.ListProducts();
                 break;
             case 2:
-                Console.WriteLine("\nTotal Price:");
+                productManager.GetTotalValue();
                 break;
             case 3:
                 Console.WriteLine("\nAdd a new product:");
@@ -84,6 +99,9 @@ class Program
                 break;
             case 4:
                 Console.WriteLine("\nUpdate product quantity:");
+                Console.WriteLine("\nCurrent Product list: ");
+                productManager.ListProducts();
+
                 productManager.UpdateProduct();
                 break;
             case 5:
@@ -110,16 +128,6 @@ class Program
             default:
                 Console.WriteLine("Exiting program");
                 break;
-        }
-    }
-
-    // Open connection with database
-    private static void OpenSqlConnection(string connectionString)
-    {
-        using (SqlConnection connection = new SqlConnection(connectionString))
-        {
-            connection.Open();
-            Console.WriteLine("Successfully connected to the server!");
         }
     }
 }
