@@ -1,6 +1,12 @@
 ﻿# Inventory Management Application
 A simple inventory management application created in C# Console Application connected to an MSSQL server database.
 
+## Input types
+The program will ask you again for an input if the input type is incorrect.
+- Price and quantity must be valid positive numbers.
+- Quantity must be an integer, but price can be a decimal.
+- ProductID must be a valid GUID.
+
 ## How to connect your database
 - Open the project solution, go to server explorer, and click ``Connect to Database``.
 - Fill in your database details and press OK.
